@@ -12,10 +12,11 @@ const config: Phaser.Types.Core.GameConfig = {
     arcade: { debug: false }
   },
   scale: {
-    mode: Phaser.Scale.RESIZE,
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
     parent: 'phaser-game',
-    width: '100%',
-    height: '100%'
+    width: 1280,
+    height: 720
   },
   scene: [TitleScene, MainScene]
 };
