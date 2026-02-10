@@ -3,6 +3,11 @@ import Phaser from 'phaser';
 import { TitleScene } from './scenes/titleScene';
 import { MainScene } from './scenes/mainScene';
 
+// ====== 画面サイズ判定 ======
+const isPortrait = window.innerHeight > window.innerWidth;
+const gameWidth = isPortrait ? 720 : 1280;
+const gameHeight = isPortrait ? 1280 : 720;
+
 // ====== Phaser ゲーム設定 ======
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -15,8 +20,8 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     parent: 'phaser-game',
-    width: 1280,
-    height: 720
+    width: gameWidth,
+    height: gameHeight
   },
   scene: [TitleScene, MainScene]
 };
