@@ -45,19 +45,23 @@
 
         /* ゲームコンテナ */
         .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 1;
         }
 
         /* ヘッダー */
         .game-header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             text-align: center;
-            margin-bottom: 20px;
+            z-index: 10;
+            pointer-events: none;
             animation: fadeInDown 1s ease-out;
         }
 
@@ -78,12 +82,15 @@
 
         /* コントロールパネル */
         .control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px 20px;
+            z-index: 10;
             animation: fadeInUp 1s ease-out 0.5s both;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
@@ -127,27 +134,8 @@
 
         /* ゲーム画面 */
         #phaser-game {
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 
-                0 0 50px rgba(0, 212, 255, 0.3),
-                0 8px 32px rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            animation: fadeInUp 1s ease-out 1s both;
-            position: relative;
-        }
-
-        #phaser-game::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #00d4ff, #0099cc, #006699, #00d4ff);
-            border-radius: 17px;
-            z-index: -1;
-            animation: borderGlow 3s ease-in-out infinite;
+            width: 100%;
+            height: 100%;
         }
 
         @keyframes borderGlow {
