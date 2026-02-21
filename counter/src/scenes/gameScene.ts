@@ -234,17 +234,16 @@ export class GameScene extends Phaser.Scene {
 
     this.overlay.clear();
     if (hidePercent > 0) {
-      const textBounds = this.counterText.getBounds();
-      const overlayHeight = textBounds.height * hidePercent;
+      const gw = this.scale.width;
+      const gh = this.scale.height;
+      // テキスト幅ではなくカウンター背景の固定幅を使う（9.99→10.00で幅が変わるのを防ぐ）
+      const overlayX = gw / 2 - 140;
+      const overlayY = gh / 2 - 90;
+      const overlayW = 280;
+      const overlayH = 140 * hidePercent;
 
       this.overlay.fillGradientStyle(0x6366f1, 0x8b5cf6, 0x6366f1, 0x8b5cf6, 1.0);
-      this.overlay.fillRoundedRect(
-        textBounds.x,
-        textBounds.y,
-        textBounds.width,
-        overlayHeight,
-        12
-      );
+      this.overlay.fillRoundedRect(overlayX, overlayY, overlayW, overlayH, 12);
 
       if (hidePercent > 0.5) {
         this.showHiddenText();
