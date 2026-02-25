@@ -211,7 +211,7 @@ export class GameScene extends Phaser.Scene {
 
     // ベストスコア更新時はメッセージ表示
     if (isNewBest) {
-      this.add.text(WIDTH / 2, HEIGHT / 2 + 38, '🎉 ベストスコア更新！', {
+      this.add.text(WIDTH / 2, HEIGHT / 2 + 38, 'ベストスコア更新！', {
         fontSize: '20px',
         color: '#ffdd44',
         fontFamily: 'sans-serif',
