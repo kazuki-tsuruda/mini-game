@@ -143,11 +143,10 @@ export class GameScene extends Phaser.Scene {
     // パドルの中心からのオフセットでX方向の反射角を調整
     const hitOffset = (this.ball.x - this.paddle.x) / (GAME_CONFIG.PADDLE_WIDTH / 2);
     const bounceAngleDeg = hitOffset * 60; // 最大±60度
-    const speed = Math.sqrt(ballBody.velocity.x ** 2 + ballBody.velocity.y ** 2) + GAME_CONFIG.BALL_SPEED_INCREMENT;
+    const speed = Math.sqrt(ballBody.velocity.x ** 2 + ballBody.velocity.y ** 2);
 
-    const clampedSpeed = Math.min(speed, 700);
     const rad = Phaser.Math.DegToRad(-90 + bounceAngleDeg); // 上方向ベース
-    ballBody.setVelocity(Math.cos(rad) * clampedSpeed, Math.sin(rad) * clampedSpeed);
+    ballBody.setVelocity(Math.cos(rad) * speed, Math.sin(rad) * speed);
 
     // スコア加算
     this.score++;
