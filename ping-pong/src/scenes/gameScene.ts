@@ -17,7 +17,8 @@ export class GameScene extends Phaser.Scene {
   private startText!: Phaser.GameObjects.Text;
 
   private elapsedSec = 0;
-  private speedBoosted = false;
+  private speedBoosted1 = false;
+  private speedBoosted2 = false;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -92,7 +93,8 @@ export class GameScene extends Phaser.Scene {
   private launchBall(): void {
     this.isStarted = true;
     this.elapsedSec = 0;
-    this.speedBoosted = false;
+    this.speedBoosted1 = false;
+    this.speedBoosted2 = false;
 
     const angle = Phaser.Math.Between(200, 340); // 上方向に飛ぶ角度
     const rad = Phaser.Math.DegToRad(angle);
@@ -111,12 +113,16 @@ export class GameScene extends Phaser.Scene {
   update(_time: number, delta: number): void {
     if (!this.isStarted || this.isGameOver) return;
 
-    // 経過秒数を加算し、60秒でスピードアップ
+    // 経過秒数を加算し、30秒・60秒でスピードアップ
     this.elapsedSec += delta / 1000;
     this.elapsedText.setText(`けいか時間: ${Math.floor(this.elapsedSec)}びょう`);
-    if (!this.speedBoosted && this.elapsedSec >= GAME_CONFIG.SPEED_BOOST_SEC) {
-      this.speedBoosted = true;
-      this.applySpeedBoost();
+    if (!this.speedBoosted1 && this.elapsedSec >= GAME_CONFIG.SPEED_BOOST_SEC_1) {
+      this.speedBoosted1 = true;
+      this.applySpeedBoost(GAME_CONFIG.SPEED_BOOST_MULTIPLIER_1);
+    }
+    if (!this.speedBoosted2 && this.elapsedSec >= GAME_CONFIG.SPEED_BOOST_SEC_2) {
+      this.speedBoosted2 = true;
+      this.applySpeedBoost(GAME_CONFIG.SPEED_BOOST_MULTIPLIER_2);
     }
 
     // ボールとパドルの衝突
@@ -128,12 +134,13 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private applySpeedBoost(): void {
+  private applySpeedBoost(multiplier: number): void {
     const vx = this.ballBody.velocity.x;
     const vy = this.ballBody.velocity.y;
     const currentSpeed = Math.sqrt(vx * vx + vy * vy);
-    const boostedSpeed = Math.min(currentSpeed * GAME_CONFIG.SPEED_BOOST_MULTIPLIER, 700);
-    const ratio = boostedSpeed / currentSpeed;
+    // 元の速度（BALL_SPEED）を基準に倍率を適用
+    const targetSpeed = GAME_CONFIG.BALL_SPEED * multiplier;
+    const ratio = targetSpeed / currentSpeed;
     this.ballBody.setVelocity(vx * ratio, vy * ratio);
   }
 
