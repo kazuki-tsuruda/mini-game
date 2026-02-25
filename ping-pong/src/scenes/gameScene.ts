@@ -30,23 +30,26 @@ export class GameScene extends Phaser.Scene {
   create(): void {
     const W = this.scale.width;
     const H = this.scale.height;
+    const isMobile = H > W;
+    const ballRadius    = isMobile ? GAME_CONFIG.BALL_RADIUS_MOBILE  : GAME_CONFIG.BALL_RADIUS;
+    const paddleHeight  = isMobile ? GAME_CONFIG.PADDLE_HEIGHT_MOBILE : GAME_CONFIG.PADDLE_HEIGHT;
 
     // 背景
     this.add.rectangle(W / 2, H / 2, W, H, GAME_CONFIG.BACKGROUND_COLOR);
 
     // パドル
     const paddleY = H - GAME_CONFIG.PADDLE_Y_OFFSET;
-    this.paddle = this.add.rectangle(W / 2, paddleY, GAME_CONFIG.PADDLE_WIDTH, GAME_CONFIG.PADDLE_HEIGHT, 0xffffff);
+    this.paddle = this.add.rectangle(W / 2, paddleY, GAME_CONFIG.PADDLE_WIDTH, paddleHeight, 0xffffff);
     this.physics.add.existing(this.paddle, true);
     this.paddleBody = this.paddle.body as Phaser.Physics.Arcade.StaticBody;
 
     // ボール
-    this.ball = this.add.circle(W / 2, H / 2, GAME_CONFIG.BALL_RADIUS, 0xffffff);
+    this.ball = this.add.circle(W / 2, H / 2, ballRadius, 0xffffff);
     this.physics.add.existing(this.ball);
     this.ballBody = this.ball.body as Phaser.Physics.Arcade.Body;
     this.ballBody.setCollideWorldBounds(true);
     this.ballBody.setBounce(1, 1);
-    this.ballBody.setCircle(GAME_CONFIG.BALL_RADIUS);
+    this.ballBody.setCircle(ballRadius);
 
     // 物理境界 (下辺はゲームオーバー判定のため世界の境界に含めない)
     this.physics.world.setBoundsCollision(true, true, true, false);
