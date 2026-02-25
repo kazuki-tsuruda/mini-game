@@ -10,6 +10,13 @@ export class GameScene extends Phaser.Scene {
   private score = 0;
   private scoreText!: Phaser.GameObjects.Text;
   private isGameOver = false;
+  private isStarted = false;
+
+  private startBg!: Phaser.GameObjects.Rectangle;
+  private startText!: Phaser.GameObjects.Text;
+
+  private elapsedSec = 0;
+  private speedBoosted = false;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -49,11 +56,36 @@ export class GameScene extends Phaser.Scene {
     this.input.on('pointermove', this.onPointerMove, this);
     this.input.on('pointerdown', this.onPointerMove, this);
 
-    // ゲーム開始
-    this.startGame();
+    // STARTボタン表示
+    this.showStartButton();
   }
 
-  private startGame(): void {
+  private showStartButton(): void {
+    const { WIDTH, HEIGHT } = GAME_CONFIG;
+
+    this.startBg = this.add.rectangle(WIDTH / 2, HEIGHT / 2, 200, 50, 0x4488ff)
+      .setDepth(11)
+      .setInteractive({ useHandCursor: true });
+
+    this.startText = this.add.text(WIDTH / 2, HEIGHT / 2, 'START', {
+      fontSize: '22px',
+      color: '#ffffff',
+      fontFamily: 'sans-serif',
+      fontStyle: 'bold',
+    }).setOrigin(0.5).setDepth(12);
+
+    this.startBg.on('pointerdown', () => {
+      this.startBg.destroy();
+      this.startText.destroy();
+      this.launchBall();
+    });
+  }
+
+  private launchBall(): void {
+    this.isStarted = true;
+    this.elapsedSec = 0;
+    this.speedBoosted = false;
+
     const angle = Phaser.Math.Between(200, 340); // 上方向に飛ぶ角度
     const rad = Phaser.Math.DegToRad(angle);
     const speed = GAME_CONFIG.BALL_SPEED;
@@ -68,8 +100,15 @@ export class GameScene extends Phaser.Scene {
     this.paddleBody.reset(x, this.paddle.y);
   }
 
-  update(): void {
-    if (this.isGameOver) return;
+  update(_time: number, delta: number): void {
+    if (!this.isStarted || this.isGameOver) return;
+
+    // 経過秒数を加算し、60秒でスピードアップ
+    this.elapsedSec += delta / 1000;
+    if (!this.speedBoosted && this.elapsedSec >= GAME_CONFIG.SPEED_BOOST_SEC) {
+      this.speedBoosted = true;
+      this.applySpeedBoost();
+    }
 
     // ボールとパドルの衝突
     this.physics.overlap(this.ball, this.paddle, this.onBallHitPaddle, undefined, this);
@@ -78,6 +117,15 @@ export class GameScene extends Phaser.Scene {
     if (this.ball.y > GAME_CONFIG.HEIGHT + GAME_CONFIG.BALL_RADIUS) {
       this.triggerGameOver();
     }
+  }
+
+  private applySpeedBoost(): void {
+    const vx = this.ballBody.velocity.x;
+    const vy = this.ballBody.velocity.y;
+    const currentSpeed = Math.sqrt(vx * vx + vy * vy);
+    const boostedSpeed = Math.min(currentSpeed * GAME_CONFIG.SPEED_BOOST_MULTIPLIER, 700);
+    const ratio = boostedSpeed / currentSpeed;
+    this.ballBody.setVelocity(vx * ratio, vy * ratio);
   }
 
   private onBallHitPaddle(): void {

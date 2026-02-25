@@ -13,4 +13,6 @@ export const GAME_CONFIG = {
 
   BACKGROUND_COLOR: 0x595959,
 
+  SPEED_BOOST_SEC: 60,
+  SPEED_BOOST_MULTIPLIER: 1.5,
 } as const;
