@@ -1,15 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
 
-// チュートリアルメッセージの定義
-interface TutorialStep {
-  text: string;
-  targetX: number;
-  targetY: number;
-  side: 'left' | 'right';
-  delay: number;
-}
-
 export class GameScene extends Phaser.Scene {
   private ball!: Phaser.GameObjects.Arc;
   private paddle!: Phaser.GameObjects.Rectangle;
@@ -19,11 +10,6 @@ export class GameScene extends Phaser.Scene {
   private score = 0;
   private scoreText!: Phaser.GameObjects.Text;
   private isGameOver = false;
-  private isGameStarted = false;
-
-  private tutorialGraphics: Phaser.GameObjects.GameObject[] = [];
-  private currentTutorialStep = 0;
-  private tutorialSteps!: TutorialStep[];
 
   constructor() {
     super({ key: 'GameScene' });
@@ -63,123 +49,16 @@ export class GameScene extends Phaser.Scene {
     this.input.on('pointermove', this.onPointerMove, this);
     this.input.on('pointerdown', this.onPointerMove, this);
 
-    // チュートリアルステップの設定
-    this.tutorialSteps = [
-      {
-        text: 'ボールは壁やパネルに当たると跳ね返ります。',
-        targetX: this.ball.x,
-        targetY: this.ball.y,
-        side: 'left',
-        delay: 500,
-      },
-      {
-        text: 'パネルは左右に動かせます。\nPC画面ではマウスクリック、スマホ画\n面ではタップで移動します。',
-        targetX: this.paddle.x,
-        targetY: this.paddle.y,
-        side: 'right',
-        delay: 500,
-      },
-      {
-        text: 'ボールが下に付くとゲームオーバーです',
-        targetX: WIDTH - 40,
-        targetY: HEIGHT - 60,
-        side: 'right',
-        delay: 500,
-      },
-    ];
-
-    // チュートリアル開始
-    this.showNextTutorial();
-  }
-
-  // --------- チュートリアル ---------
-
-  private showNextTutorial(): void {
-    if (this.currentTutorialStep >= this.tutorialSteps.length) {
-      this.startGame();
-      return;
-    }
-
-    const step = this.tutorialSteps[this.currentTutorialStep];
-    this.time.delayedCall(step.delay, () => {
-      this.showTutorialBubble(step, () => {
-        this.currentTutorialStep++;
-        this.showNextTutorial();
-      });
-    });
-  }
-
-  private showTutorialBubble(step: TutorialStep, onComplete: () => void): void {
-    const { WIDTH } = GAME_CONFIG;
-
-    // 吹き出しのサイズ・位置を決定
-    const bubbleW = 220;
-    const bubbleH = 90;
-    const arrowSize = 20;
-    const padding = 12;
-
-    // 吹き出しの左上座標
-    let bx: number;
-    let by: number;
-
-    if (step.side === 'left') {
-      bx = Math.max(10, step.targetX - bubbleW - arrowSize);
-      by = Math.max(10, step.targetY - bubbleH / 2);
-    } else {
-      bx = Math.min(WIDTH - bubbleW - 10, step.targetX - bubbleW / 2);
-      by = Math.max(10, step.targetY - bubbleH - arrowSize);
-    }
-
-    const graphics = this.add.graphics();
-    const alpha = 0.85;
-    const fillColor = 0xf4a070;
-
-    // 吹き出し本体
-    graphics.fillStyle(fillColor, alpha);
-    graphics.fillRoundedRect(bx, by, bubbleW, bubbleH, 8);
-
-    // 矢印（ターゲットに向けて）
-    if (step.side === 'left') {
-      // 右辺から矢印
-      const ax = bx + bubbleW;
-      const ay = by + bubbleH / 2;
-      graphics.fillTriangle(ax, ay - 10, ax, ay + 10, step.targetX, step.targetY);
-    } else {
-      // 下辺から矢印
-      const ax = Math.min(Math.max(step.targetX, bx + 20), bx + bubbleW - 20);
-      const ay = by + bubbleH;
-      graphics.fillTriangle(ax - 10, ay, ax + 10, ay, step.targetX, step.targetY);
-    }
-
-    const text = this.add.text(bx + padding, by + padding, step.text, {
-      fontSize: '13px',
-      color: '#222222',
-      fontFamily: 'sans-serif',
-      wordWrap: { width: bubbleW - padding * 2 },
-      lineSpacing: 4,
-    });
-
-    this.tutorialGraphics.push(graphics, text);
-
-    // 一定時間後に消す
-    this.time.delayedCall(GAME_CONFIG.TUTORIAL_DURATION, () => {
-      graphics.destroy();
-      text.destroy();
-      onComplete();
-    });
+    // ゲーム開始
+    this.startGame();
   }
 
   private startGame(): void {
-    this.isGameStarted = true;
-
-    // ボールを初期速度で発射
     const angle = Phaser.Math.Between(200, 340); // 上方向に飛ぶ角度
     const rad = Phaser.Math.DegToRad(angle);
     const speed = GAME_CONFIG.BALL_SPEED;
     this.ballBody.setVelocity(Math.cos(rad) * speed, Math.sin(rad) * speed);
   }
-
-  // --------- ポインター操作 ---------
 
   private onPointerMove(pointer: Phaser.Input.Pointer): void {
     if (this.isGameOver) return;
@@ -189,10 +68,8 @@ export class GameScene extends Phaser.Scene {
     this.paddleBody.reset(x, this.paddle.y);
   }
 
-  // --------- 更新処理 ---------
-
   update(): void {
-    if (!this.isGameStarted || this.isGameOver) return;
+    if (this.isGameOver) return;
 
     // ボールとパドルの衝突
     this.physics.overlap(this.ball, this.paddle, this.onBallHitPaddle, undefined, this);
