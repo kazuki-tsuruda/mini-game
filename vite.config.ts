@@ -10,6 +10,7 @@ export default defineConfig({
         blockgame: resolve(__dirname, 'blockgame/index.html'),
         counter: resolve(__dirname, 'counter/index.html'),
         shooter: resolve(__dirname, 'shooter/index.html'),
+        'ping-pong': resolve(__dirname, 'ping-pong/index.html'),
       },
     },
   },

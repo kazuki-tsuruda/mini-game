@@ -17,6 +17,7 @@
     "shooter/src/**/*.ts",
     "counter/src/**/*.ts",
     "blockgame/src/**/*.ts",
+    "ping-pong/src/**/*.ts",
     "vite.config.ts"
   ]
 }
