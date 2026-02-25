@@ -1,7 +1,4 @@
 export const GAME_CONFIG = {
-  WIDTH: 880,
-  HEIGHT: 600,
-
   BALL_RADIUS: 12,
   BALL_SPEED: 320,
 

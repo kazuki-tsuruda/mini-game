@@ -28,19 +28,20 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
-    const { WIDTH, HEIGHT } = GAME_CONFIG;
+    const W = this.scale.width;
+    const H = this.scale.height;
 
     // 背景
-    this.add.rectangle(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, GAME_CONFIG.BACKGROUND_COLOR);
+    this.add.rectangle(W / 2, H / 2, W, H, GAME_CONFIG.BACKGROUND_COLOR);
 
     // パドル
-    const paddleY = HEIGHT - GAME_CONFIG.PADDLE_Y_OFFSET;
-    this.paddle = this.add.rectangle(WIDTH / 2, paddleY, GAME_CONFIG.PADDLE_WIDTH, GAME_CONFIG.PADDLE_HEIGHT, 0xffffff);
+    const paddleY = H - GAME_CONFIG.PADDLE_Y_OFFSET;
+    this.paddle = this.add.rectangle(W / 2, paddleY, GAME_CONFIG.PADDLE_WIDTH, GAME_CONFIG.PADDLE_HEIGHT, 0xffffff);
     this.physics.add.existing(this.paddle, true);
     this.paddleBody = this.paddle.body as Phaser.Physics.Arcade.StaticBody;
 
     // ボール
-    this.ball = this.add.circle(WIDTH / 2, HEIGHT / 2, GAME_CONFIG.BALL_RADIUS, 0xffffff);
+    this.ball = this.add.circle(W / 2, H / 2, GAME_CONFIG.BALL_RADIUS, 0xffffff);
     this.physics.add.existing(this.ball);
     this.ballBody = this.ball.body as Phaser.Physics.Arcade.Body;
     this.ballBody.setCollideWorldBounds(true);
@@ -51,7 +52,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.world.setBoundsCollision(true, true, true, false);
 
     // スコア表示
-    this.scoreText = this.add.text(WIDTH / 2, 20, 'スコア: 0', {
+    this.scoreText = this.add.text(W / 2, 20, 'スコア: 0', {
       fontSize: '20px',
       color: '#ffffff',
       fontFamily: 'sans-serif',
@@ -73,9 +74,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private showStartButton(): void {
-    const { WIDTH, HEIGHT } = GAME_CONFIG;
-    const centerX = WIDTH / 2;
-    const centerY = HEIGHT / 2;
+    const W = this.scale.width;
+    const H = this.scale.height;
+    const centerX = W / 2;
+    const centerY = H / 2;
 
     // タイトル
     this.add.text(centerX, centerY - 80, 'ピンポンゲーム', {
@@ -127,7 +129,7 @@ export class GameScene extends Phaser.Scene {
   private onPointerMove(pointer: Phaser.Input.Pointer): void {
     if (this.isGameOver) return;
     const halfW = GAME_CONFIG.PADDLE_WIDTH / 2;
-    const x = Phaser.Math.Clamp(pointer.x, halfW, GAME_CONFIG.WIDTH - halfW);
+    const x = Phaser.Math.Clamp(pointer.x, halfW, this.scale.width - halfW);
     this.paddle.setX(x);
     this.paddleBody.reset(x, this.paddle.y);
   }
@@ -151,7 +153,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.overlap(this.ball, this.paddle, this.onBallHitPaddle, undefined, this);
 
     // ボールが画面下部を超えたらゲームオーバー
-    if (this.ball.y > GAME_CONFIG.HEIGHT + GAME_CONFIG.BALL_RADIUS) {
+    if (this.ball.y > this.scale.height + GAME_CONFIG.BALL_RADIUS) {
       this.triggerGameOver();
     }
   }
@@ -189,21 +191,22 @@ export class GameScene extends Phaser.Scene {
     // ベストスコア更新
     const isNewBest = this.scoreManager.updateBestScore(this.score);
 
-    const { WIDTH, HEIGHT } = GAME_CONFIG;
+    const W = this.scale.width;
+    const H = this.scale.height;
 
     // 暗転オーバーレイ
-    const overlay = this.add.rectangle(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, 0x000000, 0.6);
+    const overlay = this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.6);
     overlay.setDepth(10);
 
     // ゲームオーバーテキスト
-    this.add.text(WIDTH / 2, HEIGHT / 2 - 60, 'GAME OVER', {
+    this.add.text(W / 2, H / 2 - 60, 'GAME OVER', {
       fontSize: '48px',
       color: '#ff4444',
       fontFamily: 'sans-serif',
       fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(11);
 
-    this.add.text(WIDTH / 2, HEIGHT / 2, `スコア: ${this.score}`, {
+    this.add.text(W / 2, H / 2, `スコア: ${this.score}`, {
       fontSize: '28px',
       color: '#ffffff',
       fontFamily: 'sans-serif',
@@ -211,7 +214,7 @@ export class GameScene extends Phaser.Scene {
 
     // ベストスコア更新時はメッセージ表示
     if (isNewBest) {
-      this.add.text(WIDTH / 2, HEIGHT / 2 + 38, 'ベストスコア更新！', {
+      this.add.text(W / 2, H / 2 + 38, 'ベストスコア更新！', {
         fontSize: '20px',
         color: '#ffdd44',
         fontFamily: 'sans-serif',
@@ -219,8 +222,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     // リトライボタン
-    const retryBg = this.add.rectangle(WIDTH / 2, HEIGHT / 2 + 80, 200, 50, 0x4488ff).setDepth(11).setInteractive({ useHandCursor: true });
-    this.add.text(WIDTH / 2, HEIGHT / 2 + 80, 'もう一度', {
+    const retryBg = this.add.rectangle(W / 2, H / 2 + 80, 200, 50, 0x4488ff).setDepth(11).setInteractive({ useHandCursor: true });
+    this.add.text(W / 2, H / 2 + 80, 'もう一度', {
       fontSize: '22px',
       color: '#ffffff',
       fontFamily: 'sans-serif',
