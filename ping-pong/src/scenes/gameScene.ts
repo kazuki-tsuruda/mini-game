@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_CONFIG } from '../config/gameConfig';
+import { ScoreManager } from '../managers/scoreManager';
 
 export class GameScene extends Phaser.Scene {
   private ball!: Phaser.GameObjects.Arc;
@@ -19,6 +20,8 @@ export class GameScene extends Phaser.Scene {
   private elapsedSec = 0;
   private speedBoosted1 = false;
   private speedBoosted2 = false;
+
+  private scoreManager = new ScoreManager();
 
   constructor() {
     super({ key: 'GameScene' });
@@ -71,12 +74,31 @@ export class GameScene extends Phaser.Scene {
 
   private showStartButton(): void {
     const { WIDTH, HEIGHT } = GAME_CONFIG;
+    const centerX = WIDTH / 2;
+    const centerY = HEIGHT / 2;
 
-    this.startBg = this.add.rectangle(WIDTH / 2, HEIGHT / 2, 200, 50, 0x4488ff)
+    // タイトル
+    this.add.text(centerX, centerY - 80, 'ピンポンゲーム', {
+      fontSize: '36px',
+      color: '#ffffff',
+      fontFamily: 'sans-serif',
+      fontStyle: 'bold',
+    }).setOrigin(0.5).setDepth(12);
+
+    // ベストスコア
+    const best = this.scoreManager.getBestScore();
+    this.add.text(centerX, centerY - 25, `ベストスコア：${best}`, {
+      fontSize: '22px',
+      color: '#ffdd44',
+      fontFamily: 'sans-serif',
+    }).setOrigin(0.5).setDepth(12);
+
+    // STARTボタン
+    this.startBg = this.add.rectangle(centerX, centerY + 40, 200, 50, 0x4488ff)
       .setDepth(11)
       .setInteractive({ useHandCursor: true });
 
-    this.startText = this.add.text(WIDTH / 2, HEIGHT / 2, 'START', {
+    this.startText = this.add.text(centerX, centerY + 40, 'START', {
       fontSize: '22px',
       color: '#ffffff',
       fontFamily: 'sans-serif',
@@ -164,6 +186,9 @@ export class GameScene extends Phaser.Scene {
     this.isGameOver = true;
     this.ballBody.setVelocity(0, 0);
 
+    // ベストスコア更新
+    const isNewBest = this.scoreManager.updateBestScore(this.score);
+
     const { WIDTH, HEIGHT } = GAME_CONFIG;
 
     // 暗転オーバーレイ
@@ -184,9 +209,18 @@ export class GameScene extends Phaser.Scene {
       fontFamily: 'sans-serif',
     }).setOrigin(0.5).setDepth(11);
 
+    // ベストスコア更新時はメッセージ表示
+    if (isNewBest) {
+      this.add.text(WIDTH / 2, HEIGHT / 2 + 38, '🎉 ベストスコア更新！', {
+        fontSize: '20px',
+        color: '#ffdd44',
+        fontFamily: 'sans-serif',
+      }).setOrigin(0.5).setDepth(11);
+    }
+
     // リトライボタン
-    const retryBg = this.add.rectangle(WIDTH / 2, HEIGHT / 2 + 70, 200, 50, 0x4488ff).setDepth(11).setInteractive({ useHandCursor: true });
-    this.add.text(WIDTH / 2, HEIGHT / 2 + 70, 'もう一度', {
+    const retryBg = this.add.rectangle(WIDTH / 2, HEIGHT / 2 + 80, 200, 50, 0x4488ff).setDepth(11).setInteractive({ useHandCursor: true });
+    this.add.text(WIDTH / 2, HEIGHT / 2 + 80, 'もう一度', {
       fontSize: '22px',
       color: '#ffffff',
       fontFamily: 'sans-serif',
