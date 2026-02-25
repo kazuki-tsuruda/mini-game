@@ -9,6 +9,7 @@ export class GameScene extends Phaser.Scene {
 
   private score = 0;
   private scoreText!: Phaser.GameObjects.Text;
+  private elapsedText!: Phaser.GameObjects.Text;
   private isGameOver = false;
   private isStarted = false;
 
@@ -51,6 +52,13 @@ export class GameScene extends Phaser.Scene {
       color: '#ffffff',
       fontFamily: 'sans-serif',
     }).setOrigin(0.5, 0);
+
+    // けいか時間表示
+    this.elapsedText = this.add.text(16, 16, 'けいか時間: 0びょう', {
+      fontSize: '18px',
+      color: '#ffffff',
+      fontFamily: 'sans-serif',
+    }).setOrigin(0, 0);
 
     // 入力
     this.input.on('pointermove', this.onPointerMove, this);
@@ -105,6 +113,7 @@ export class GameScene extends Phaser.Scene {
 
     // 経過秒数を加算し、60秒でスピードアップ
     this.elapsedSec += delta / 1000;
+    this.elapsedText.setText(`けいか時間: ${Math.floor(this.elapsedSec)}びょう`);
     if (!this.speedBoosted && this.elapsedSec >= GAME_CONFIG.SPEED_BOOST_SEC) {
       this.speedBoosted = true;
       this.applySpeedBoost();
